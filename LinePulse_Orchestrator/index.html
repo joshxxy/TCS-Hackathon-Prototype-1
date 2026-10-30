@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LinePulse Orchestrator</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="brand"><div class="logo">⌁</div><div><strong>LinePulse</strong><span>Orchestrator</span></div></div>
+  <nav class="nav">
+    <div class="nav-label">WORKSPACE</div>
+    <button class="active" data-view="overview"><span class="ico">▦</span><span class="nav-text">Live overview</span></button>
+    <button data-view="issues"><span class="ico">◉</span><span class="nav-text">Issue queue <span id="navCount" class="accent"></span></span></button>
+    <button data-view="analytics"><span class="ico">▥</span><span class="nav-text">Analytics</span></button>
+    <button data-view="activity"><span class="ico">↻</span><span class="nav-text">Activity log</span></button>
+  </nav>
+  <div class="side-bottom"><div class="demo-card"><b>⚡ Demo controls</b><p>Generate a realistic machine event to test the orchestration flow.</p><button class="primary small" style="width:100%" onclick="triggerAnomaly()">Trigger anomaly</button></div></div>
+</aside>
+<main class="main">
+<header class="topbar">
+ <div><div class="eyebrow">Factory operations · Plant 01</div><h1 id="pageTitle">Live line overview</h1></div>
+ <div class="top-actions"><div class="live-pill"><span class="dot" id="liveDot"></span><span id="liveText">SIMULATION LIVE</span></div><select id="roleSelect" class="role-select" aria-label="Select role"><option>Operator</option><option>Supervisor</option><option>Maintenance</option><option>Manager</option></select><button id="simButton" onclick="toggleSimulation()">Ⅱ Pause</button></div>
+</header>
+<div class="banner"><b>DEMO ENVIRONMENT</b> &nbsp; All machine readings, AI assessments, downtime, and cost figures are simulated estimates—not real factory data or validated predictions.</div>
+<section class="view active" id="view-overview">
+ <div class="grid stats">
+  <div class="card"><div class="stat-top">Machines online <span class="stat-icon">⌁</span></div><div class="stat-num" id="onlineStat">4<span style="font-size:15px;color:var(--muted)"> / 6</span></div><div class="stat-foot"><span class="accent">●</span> Live machine heartbeat</div></div>
+  <div class="card"><div class="stat-top">Open issues <span class="stat-icon">◉</span></div><div class="stat-num" id="openStat">4</div><div class="stat-foot"><span class="critical">▲</span> <span id="criticalStat">2 critical / high</span></div></div>
+  <div class="card"><div class="stat-top">Maintenance risk <span class="stat-icon">⌁</span></div><div class="stat-num warning" id="riskStat">2</div><div class="stat-foot">Machines flagged for attention</div></div>
+  <div class="card"><div class="stat-top">Est. downtime exposure <span class="stat-icon">◷</span></div><div class="stat-num" id="costStat">₹18.4k</div><div class="stat-foot">Simulated cost at ₹400/min</div></div>
+ </div>
+ <div class="section-head"><div><h2>Machine health</h2><p>Live simulated telemetry · refreshes every 3 seconds</p></div><button class="small" onclick="triggerAnomaly()">＋ Simulate issue</button></div>
+ <div class="grid machines" id="machineGrid"></div>
+ <div class="grid two-col">
+  <div class="card queue-card"><div class="queue-header"><div><h2 style="margin:0;font-size:16px">Priority issue queue</h2><p style="margin:4px 0 0;color:var(--muted);font-size:11px">Ranked by severity, urgency and machine-health risk</p></div><button class="small" onclick="switchView('issues')">View all →</button></div><div class="issue-list" id="overviewIssues"></div></div>
+  <div class="right-stack">
+   <div class="card"><div class="section-head"><div><h2>Smart alerts</h2><p>Role-routed attention signals</p></div><span class="badge critical" id="alertCount">3 NEW</span></div><div id="alertList"></div></div>
+   <div class="card"><div class="section-head"><div><h2>Line pulse</h2><p>Simulated output rate over recent intervals</p></div><span class="accent" style="font-size:12px">● Live</span></div><div class="mini-chart" id="pulseChart"></div><div class="legend"><span><i></i>Output / interval</span><span><i class="red"></i>Incident markers</span></div></div>
+  </div>
+ </div>
+</section>
+<section class="view" id="view-issues">
+ <div class="card queue-card"><div class="queue-header"><div><h2 style="margin:0">All issues</h2><p style="margin:4px 0 0;color:var(--muted);font-size:11px">Acknowledge, assign, and track a response without losing context.</p></div><button class="primary small" onclick="triggerAnomaly()">＋ Trigger demo issue</button></div>
+ <div class="filters"><select id="machineFilter" onchange="renderIssues()"><option value="all">All machines</option><option>M-01</option><option>M-02</option><option>M-03</option><option>M-04</option><option>M-05</option><option>M-06</option></select><select id="statusFilter" onchange="renderIssues()"><option value="all">All statuses</option><option>Open</option><option>Acknowledged</option><option>In Progress</option><option>Resolved</option></select><select id="roleFilter" onchange="renderIssues()"><option value="all">All teams</option><option>Operator</option><option>Supervisor</option><option>Maintenance</option><option>Manager</option></select></div>
+ <div class="issue-list" id="allIssues"></div></div>
+</section>
+<section class="view" id="view-analytics">
+ <div class="grid stats">
+  <div class="card"><div class="stat-top">Mean acknowledge time <span class="stat-icon">◷</span></div><div class="stat-num">2.4 <small style="font-size:13px">min</small></div><div class="stat-foot">Simulated demo benchmark</div></div>
+  <div class="card"><div class="stat-top">Resolved today <span class="stat-icon">✓</span></div><div class="stat-num" id="resolvedStat">3</div><div class="stat-foot">Tracked in current session</div></div>
+  <div class="card"><div class="stat-top">Issues raised <span class="stat-icon">◉</span></div><div class="stat-num" id="raisedStat">7</div><div class="stat-foot">Across 6 simulated machines</div></div>
+  <div class="card"><div class="stat-top">Potential cost avoided <span class="stat-icon">↗</span></div><div class="stat-num accent" id="avoidedStat">₹8.0k</div><div class="stat-foot">Illustrative estimate only</div></div>
+ </div>
+ <div class="grid analytics-grid">
+  <div class="card"><div class="section-head"><div><h2>Issues by severity</h2><p>Current session · simulated</p></div></div><div id="severityChart" class="mini-chart"></div><div class="legend"><span><i class="red"></i>Critical / High</span><span><i class="amber"></i>Medium</span><span><i></i>Low</span></div></div>
+  <div class="card"><div class="section-head"><div><h2>Risk by machine</h2><p>Rule-based health score</p></div></div><div id="riskChart" class="mini-chart"></div><div class="legend"><span><i></i>Risk score (0–100)</span></div></div>
+  <div class="card wide"><div class="section-head"><div><h2>Response performance</h2><p>Issue tracking in this browser session</p></div><span class="badge blue">SIMULATED</span></div><table class="table"><thead><tr><th>Metric</th><th>Value</th><th>Interpretation</th></tr></thead><tbody id="analyticsTable"></tbody></table></div>
+ </div>
+</section>
+<section class="view" id="view-activity">
+ <div class="card"><div class="section-head"><div><h2>Activity timeline</h2><p>Every acknowledgement and status change is logged locally for this demo.</p></div><button class="small" onclick="renderActivity()">↻ Refresh</button></div><div id="activityLog" class="activity"></div></div>
+</section>
+<div class="footer-note">LinePulse Orchestrator · Prototype build · Simulated data only · No real industrial systems connected</div>
+</main>
+</div>
+<div class="toast-wrap" id="toastWrap"></div>
+<div class="modal-backdrop" id="modalBackdrop" onclick="if(event.target===this)closeModal()"><div class="modal" id="modalBody"></div></div>
+<script src="app.js"></script>
+</body>
+</html>
